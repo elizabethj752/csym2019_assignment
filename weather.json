@@ -1,0 +1,84 @@
+{
+	"weatherData" : [
+		{
+			"cityId": 1,
+			"cityName": "Bath",
+			"currentConditions": "sun",
+			"tempeRature": 27,
+			"windSpeed": 25,
+			"windDirection": "South Easterly",
+			"windChillFac": 11
+		},
+
+		{
+			"cityId": 2,
+			"cityName": "Kent",
+			"currentConditions": "Cloud",
+			"tempeRature": 20,
+			"windSpeed": 19,
+			"windDirection": "Easterly",
+			"windChillFac": 8
+		},
+
+		{
+			"cityId": 3,
+			"cityName": "Northampton",
+			"currentConditions": "Rain",
+			"tempeRature": 18,
+			"windSpeed": 20,
+			"windDirection": "South Westerly",
+			"windChillFac": 5
+		},
+
+		{
+			"cityId": 4,
+			"cityName": "Canterbury",
+			"currentConditions": "sun",
+			"tempeRature": 25,
+			"windSpeed": 25,
+			"windDirection": "Westerly",
+			"windChillFac": 20
+		},
+
+		{
+			"cityId": 5,
+			"cityName": "Coventry",
+			"currentConditions": "Cloud",
+			"tempeRature": 15,
+			"windSpeed": 20,
+			"windDirection": "North Easterly",
+			"windChillFac": 12
+		},
+
+		{
+			"cityId": 6,
+			"cityName": "Birmingham",
+			"currentConditions": "Cloud",
+			"tempeRature": 19,
+			"windSpeed": 18,
+			"windDirection": "Easterly",
+			"windChillFac": 9
+		},
+
+		{
+			"cityId": 7,
+			"cityName": "Derby",
+			"currentConditions": "Rain",
+			"tempeRature": 21,
+			"windSpeed": 25,
+			"windDirection": "South Westerly",
+			"windChillFac": 15		
+        },
+
+		{
+			"cityId": 8,
+			"cityName": "Hereford",
+			"currentConditions": "sun",
+			"tempeRature": 28,
+			"windSpeed": 25,
+			"windDirection": "Easterly",
+			"windChillFac": 15
+		}
+
+	]
+}
