@@ -1,0 +1,120 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+.container-data{
+    padding: 20px 70px;
+    color:#fff;
+    
+}
+
+.current-data{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    
+    
+}
+.date-container{
+    font-weight: 100;
+}
+.date-container .time{
+    font-size: 70px;
+}
+
+.date-container #am-pm{
+    font-size: 30px;
+    margin-left: 20px;
+}
+
+.date-container .date{
+    font-size: 30px;
+    margin-bottom: 40px;
+}
+
+.topic-container{
+    text-align: end;
+}
+
+.topic-container .topic{
+    font-size: 30px;
+    font-weight: 100;
+}
+
+.topic-container .country{
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+
+
+
+body {
+    background:url('https://images.unsplash.com/photo-1621274403997-37aace184f49?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1');
+    background-repeat: no-repeat;
+    background-size:cover;
+    overflow:hidden;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    
+
+}
+
+
+select{
+    padding: 20px 15px;
+    text-align: center;
+    height: fit-content;
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    width: 500px;
+    font-weight: 500;
+    font-size: 19px;
+    color: rgb(248, 246, 246);
+    border-radius: 16px 0px 16px 0px;
+    border-bottom: 3px solid #DF8E00;
+    background-color: rgba(97, 85, 85, 0.452);
+    margin-bottom: 30px;
+    margin-left: 30px;
+}
+.selection{
+    text-align:center;
+    align-items: center;
+    
+}
+
+
+
+    #weatherData{
+        color: white;
+        font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        align-items: center;
+        border-radius: 16px 0px 16px 0px;
+        font-size: 18px;
+        font-weight: 100px;
+        text-align: center;
+        padding: 10px;
+        margin: 0;
+        margin-top: 20px;
+        line-height: 30px;
+        background-image: linear-gradient( to bottom, rgba(0,0,0,0.3),
+        rgba(0,0,0,0.6));
+   
+         }
+    
+    #cityInfo{
+        color: white;
+        font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        font-weight: 600px;
+        font-size: 30px;
+        max-width: 500px;
+        margin: 0;
+        margin-top: 30px;
+        border-bottom:0px;
+       
+    }
+    #content{
+        padding-left: 20px;
+    }
