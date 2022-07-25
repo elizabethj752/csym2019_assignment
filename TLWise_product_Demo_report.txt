@@ -1,0 +1,123 @@
+USE [ApexDB]
+GO
+/****** Object:  StoredProcedure [dbo].[TLWise_product_Demo_report]    Script Date: 6/6/2020 12:53:46 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[TLWise_product_Demo_report]
+	(
+	@Team_Name as varchar(128) ,
+	@from_Date as VARCHAR(130),
+	@To_date as VARCHAR(130)
+	
+	)
+AS
+BEGIN
+	 
+	 
+declare @strQry as varchar(Max)
+declare @tmptable as varchar(150)
+
+--declare @tmptable2 as varchar(150)
+declare @tmptable1 as varchar(150)
+
+declare @strsql  as varchar(Max)
+declare @strsql1  as varchar(Max)
+declare @strsql2  as varchar(Max)
+declare @strsql3  as varchar(Max)
+
+
+SET @tmptable =	@Team_Name + 'TLWise_product_demo_report_table'
+--print(@tmptable)
+
+set @strQry = 'IF  EXISTS (SELECT 1 FROM  sys.objects WHERE name=' + CHAR(39) +  @tmptable  + CHAR(39) + ' AND Type=''U'' )'                  
+set @strQry = @strQry + ' Drop table ' + @tmptable            
+exec (@strQry) 
+Print (@strQry) 
+
+set @strQry = 'select Module_Nm  into '  + @tmptable + '  from Apex_Modules_Details group by Module_Nm '
+exec (@strQry)
+print (@strQry)
+
+
+
+SET  @strQry	=	'ALTER TABLE  '+  @tmptable  +'   
+					ADD Pending int,Assigned int,Dropped int,Closed int,value int'
+print (@strQry)
+exec (@strQry) 
+
+
+--For Pending 
+
+set @strsql	=	'update a set a.Pending = b.Stage_Count,
+				a.value = b.value
+				from  '+@tmptable+' a 
+				join(select Revenue_Type,count(Stage)Stage_Count,Sum(value)value from Apex_CRM_Lead_Master  where Team Like '''+@Team_Name+'%'' and 
+				Stage=''Demo'' and Date >= '''+@from_Date+'''  and Date <= '''+@To_date+''' and  (Lead_Assign_To  is Null or Lead_Assign_To='''')
+				group by Revenue_Type) b on a.Module_Nm = b.Revenue_Type'
+	
+
+print(@StrSql)
+exec (@strsql)
+print(@StrSql)
+
+
+---For Assigned 
+
+set @strsql1	=	'update a set a.Assigned = b.Stage_Count,
+				a.value = b.value
+				from  '+@tmptable+' a 
+				join(select Revenue_Type,count(Stage)Stage_Count,Sum(value)value from Apex_CRM_Lead_Master  where Team Like '''+@Team_Name+'%'' and 
+				Stage=''Demo'' and Date >= '''+@from_Date+'''  and Date <= '''+@To_date+''' and  Not (Lead_Assign_To  is Null or Lead_Assign_To='''')
+				group by Revenue_Type) b on a.Module_Nm = b.Revenue_Type'
+	
+
+--print(@StrSql)
+exec (@strsql1)
+print(@StrSql1)
+
+
+---For Drop 
+
+set @strsql2	=	'update a set a.Dropped = b.Stage_Count,
+				a.value = b.value
+				from  '+@tmptable+' a 
+				join(select Revenue_Type,count(Stage)Stage_Count,Sum(value)value from Apex_CRM_Lead_Master  where Team Like '''+@Team_Name+'%'' and
+				Stage=''Drop'' and Date >= '''+@from_Date+'''  and Date <= '''+@To_date+''' and  (Lead_Assign_To  is Null or Lead_Assign_To='''')
+				group by Revenue_Type) b on a.Module_Nm = b.Revenue_Type'
+	
+
+--print(@StrSql)
+exec (@strsql2)
+print(@strsql2)
+
+
+---For Closed 
+
+set @strsql3	=	'update a set a.Closed = b.Stage_Count,
+				a.value = b.value
+				from  '+@tmptable+' a 
+				join(select Revenue_Type,count(Stage)Stage_Count,Sum(value)value from Apex_CRM_Lead_Master  where Team Like '''+@Team_Name+'%'' and 
+				Stage=''Closed'' and Date >= '''+@from_Date+'''  and Date <= '''+@To_date+''' and  (Lead_Assign_To  is Null or Lead_Assign_To='''')
+				group by Revenue_Type) b on a.Module_Nm = b.Revenue_Type'
+	
+
+--print(@StrSql)
+exec (@strsql3)
+print(@strsql3)
+
+
+
+
+
+--set @strsql='select A.STAGE_COUNT,a.stage,A.VALUE,a.tally_product,a.caller_name,b.team into '+@tmptable+' from '+@tmptable1+' a  left join apex_crm_lead_master b  on a.caller_name=b.caller_name '
+
+				
+--exec (@strsql)
+--print(@StrSql)
+
+
+
+
+end

@@ -1,0 +1,121 @@
+USE [ApexDB]
+GO
+/****** Object:  StoredProcedure [dbo].[Apex_CRM_CustomerHistory_Report]    Script Date: 5/13/2020 11:32:46 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[Apex_CRM_CustomerHistory_Report]
+(      
+@CallerName  Varchar(100),
+@FromDate	Varchar(100),
+@ToDate		Varchar(100)
+)
+
+AS  
+BEGIN  
+declare @strQry as varchar(Max)
+declare @tmptable as varchar(150)
+
+SET @tmptable =	@CallerName + 'CustomerHistory_RptTbl'
+
+set @strQry = 'IF  EXISTS (SELECT 1 FROM  sys.objects WHERE name=' + CHAR(39) +  @tmptable  + CHAR(39) + ' AND Type=''U'' )'                  
+set @strQry = @strQry + ' Drop table ' + @tmptable            
+exec (@strQry) 
+
+
+
+--set @strQry =  'Select Max(a.Cust_ID)Cust_ID,c.Ticket_No,Max(c.Customer_Name)Customer_Name,MAx(c.serial_no)serial_no , Max(b.Expiry_Date)Expiry_Date,
+--MAx(b.Tally_Product)Tally_Product,Max(a.Segment)Segment,Max(a.Hub)Hub,Max(d.Mobile_No)Mobile_No,Max(d.Email_ID)Email_ID into ' + @tmptable +'   
+--from Customer_Details a left join Revenue_Details b on a.Cust_ID=b.Cust_ID
+--left join Service_Log_Details c on a.Cust_ID=c.Cust_ID left join contact_details d on a.Cust_ID=d.Cust_ID 
+--where a.Mark_Delete = ''No'' group by c.Ticket_No'
+
+
+--print(@strQry )
+--exec (@strQry) 
+
+
+
+--set @strQry =  'Select Max(a.Cust_ID)Cust_ID,c.Ticket_No,Max(c.Date)Date,Max(c.Customer_Name)Customer_Name,MAx(c.serial_no)serial_no , Max(b.Expiry_Date)Expiry_Date,
+--MAx(b.Tally_Product)Tally_Product,Max(a.Segment)Segment,Max(a.Hub)Hub,Max(c.Time)Time into ' + @tmptable +'   
+--from Customer_Details a left join Revenue_Details b on a.Cust_ID=b.Cust_ID
+--left join Service_Log_Details c on a.Cust_ID=c.Cust_ID 
+--where a.Mark_Delete = ''No'' and Date > = '''+@FromDate+''' and Date < ='''+@ToDate+'''  group by c.Ticket_No'
+
+
+set @strQry =  'Select (Cust_ID)Cust_ID,Count(Ticket_No)Ticket_No,Max(Date)Date,Max(Customer_Name)Customer_Name,MAx(serial_no)serial_no , 
+Max(Time)Time into ' + @tmptable +'   
+from  Service_Log_Details 
+where Date > = '''+@FromDate+''' and Date < ='''+@ToDate+'''  group by Cust_ID'
+
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'Alter Table ' + @tmptable +' 
+				Add AMCTag Varchar(500),TotalSupportCalls int, Email Varchar(500), Mobile Varchar(500),
+				Expiry_Date Varchar(500),Tally_Product Varchar(500),Segment Varchar(500),Hub Varchar(500)'
+print(@strQry )
+exec (@strQry)
+
+
+
+set @strQry ='update a set a.AMCTag=''Yes'' from ' + @tmptable +' a '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry ='update a set a.AMCTag=''No'' from ' + @tmptable +' a where Cust_ID not in (Select Cust_ID from Sales_Order_Details where not (Order_For is null or Order_For ='''')  group by Cust_ID ) 
+ and not (serial_no is null or serial_no = '''' ) '
+ 
+print(@strQry )
+exec (@strQry) 
+
+--set @strQry ='update a set Tally_Product=b.Tally_Product, Expiry_Date=b.Expiry_Date   from  ' + @tmptable +' a 
+--				join Revenue_Details b on a.Cust_ID=b.Cust_ID'
+--print(@strQry )
+--exec (@strQry) 
+
+
+set @strQry ='update a set Tally_Product=b.Tally_Product, Expiry_Date=CONVERT(VARCHAR(13),b.Expiry_Date,105)  from  ' + @tmptable +' a 
+				join Revenue_Details b on a.Cust_ID=b.Cust_ID'
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry ='update a set Segment=b.Segment,Hub=b.Hub from  ' + @tmptable +' a 
+				join Customer_Details b on a.Cust_ID=b.Cust_ID'
+print(@strQry )
+exec (@strQry) 
+
+
+
+
+-- set @strQry = 'update a set a.TotalSupportCalls=b.TotalCalls from ' + @tmptable +' a join
+--(Select Cust_Id,Count(Distinct(Ticket_No))TotalCalls from ' + @tmptable +' group by Cust_Id )b on a.Cust_Id=b.Cust_Id'
+----on a.Cust_Id=b.Cust_Id'
+--print(@strQry)
+--exec (@strQry)
+
+
+
+ set @strQry = 'update a set a.TotalSupportCalls=''1'' from ' + @tmptable +' a join
+(Select Cust_Id,Count(Distinct(Ticket_No))TotalCalls from ' + @tmptable +' group by Cust_Id )b on a.Cust_Id=b.Cust_Id'
+--on a.Cust_Id=b.Cust_Id'
+print(@strQry)
+exec (@strQry)
+
+
+set @strQry ='update a set Email=b.Email_ID from  ' + @tmptable +' a 
+				join contact_details b on a.Cust_ID=b.Cust_ID'
+print(@strQry )
+exec (@strQry) 
+
+set @strQry ='update a set Mobile=b.Mobile_No from  ' + @tmptable +' a 
+				join contact_details b on a.Cust_ID=b.Cust_ID'
+print(@strQry )
+exec (@strQry) 
+
+end

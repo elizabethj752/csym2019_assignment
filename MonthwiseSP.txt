@@ -1,0 +1,271 @@
+USE [ApexDB]
+GO
+/****** Object:  StoredProcedure [dbo].[Apex_CRM_SupportCall_MonthwiseTest]    Script Date: 4/24/2020 2:19:58 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER	PROCEDURE [dbo].[Apex_CRM_SupportCall_MonthwiseTest]
+(      
+@CallerName  Varchar(100),
+@FromDate	Varchar(100),
+@ToDate		Varchar(100)
+)
+AS  
+BEGIN  
+declare @strQry as varchar(Max)
+declare @tmptable as varchar(150)
+
+SET @tmptable =	@CallerName + 'SupportCall_Monthwise_Rpt'
+
+set @strQry = 'IF  EXISTS (SELECT 1 FROM  sys.objects WHERE name=' + CHAR(39) +  @tmptable  + CHAR(39) + ' AND Type=''U'' )'                  
+set @strQry = @strQry + ' Drop table ' + @tmptable            
+exec (@strQry) 
+
+set @strQry = 'select Cust_ID,Customer_Name,Date,FORMAT(Date ,''dd'')Day,Time,Ticket_No,Query_Person,Query_Description,Query_Type,Query_Sub_Type,Concern_Person,
+				Portal_Ticket_No ,Status,Remark,With_Whome,Handled_By,Department into ' + @tmptable +' from Service_Log_Details
+				Where Date > = '''+@FromDate+''' and Date < ='''+@ToDate+''' '
+print(@strQry )
+exec (@strQry) 
+
+set @strQry = 'Alter Table ' + @tmptable +' 
+				Add Station Varchar(500),State Varchar(500),Zone Varchar(500),UserName Varchar(500) ,TeamTag Varchar(500),
+				OnsiteMember Varchar(500),OffsiteMember Varchar(500),OnOff_Site	Varchar(500),TeamLeader  Varchar(500),
+				D1 int ,D2 int ,D3 int ,D4 int ,D5 int ,D6 int ,D7 int ,D8 int , D9 int, D10 int,
+				 D11 int ,D12 int ,D13 int ,D14 int ,D15 int ,D16 int ,D17 int ,D18 int , D19 int, D20 int,
+				 D21 int ,D22 int ,D23 int ,D24 int ,D25 int ,D26 int ,D27 int ,D28 int , D29 int, D30 int,
+				D31 int'
+print(@strQry )
+exec (@strQry) 
+
+set @strQry ='update a set Station=b.station,State=b.State,Zone=b.Zone from  ' + @tmptable +' a 
+				join contact_details b on a.Cust_ID=b.Cust_ID'
+print(@strQry )
+exec (@strQry) 
+
+set @strQry = 'update a set a.TeamTag=''Team_B'' from ' + @tmptable +' a '
+print(@strQry)
+exec (@strQry)
+
+
+set @strQry = 'update a set a.TeamTag=''Team_A'' from ' + @tmptable +' a Where Department in (''Vanilla'',''CASD'',''Pune'') '
+print(@strQry)
+exec (@strQry)
+
+set @strQry = 'update a set a.TeamTag=''Team_C'' from ' + @tmptable +' a Where Department in (''Bajaj'',''Ultratech'',''Birlawhite'',''Panasonic'') '
+print(@strQry)
+exec (@strQry) 
+
+set @strQry = 'update a set a.UserName=b.User_Name2 from ' + @tmptable +' a join Login_Details b on a.Handled_By=b.Login_Nm'
+print(@strQry)
+exec (@strQry) 
+
+---------Pooja 18-04-2020
+
+set @strQry = 'update a set a.TeamLeader=b.Team from ' + @tmptable +' a join Login_Details b on a.Handled_By=b.Login_Nm'
+print(@strQry)
+exec (@strQry) 
+
+set @strQry = 'update a set a.OnsiteMember=b.Onsite_Member , a.OffsiteMember=b.Internal_Supp_Team from ' + @tmptable +' a join
+				(select Cust_ID,Internal_Supp_Team,Onsite_Member from Customer_Details)b on a.Cust_ID=b.Cust_ID '
+print(@strQry)
+exec (@strQry) 
+
+set @strQry = 'Update a set a.OnOff_Site=''Onsite'' from ' + @tmptable +'  a where a.Handled_By=a.OnsiteMember '
+print(@strQry)
+exec (@strQry) 
+
+
+set @strQry = 'Update a set a.OnOff_Site=''Offsite'' from ' + @tmptable +'   a where a.Handled_By=a.OffsiteMember '
+print(@strQry)
+exec (@strQry) 
+
+
+set @strQry = 'update a set D1=''1''  from ' + @tmptable +' a
+				where Day=''01'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D2=''1''  from ' + @tmptable +' a
+				where Day=''02'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D3=''1''  from ' + @tmptable +' a
+				where Day=''03'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D4=''1''  from ' + @tmptable +' a
+				where Day=''04'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D5=''1''  from ' + @tmptable +' a
+				where Day=''05'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D6=''1''  from ' + @tmptable +' a
+				where Day=''06'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D7=''1''  from ' + @tmptable +' a
+				where Day=''07'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D8=''1''  from ' + @tmptable +' a
+				where Day=''08'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D9=''1''  from ' + @tmptable +' a
+				where Day=''09'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D10=''1''  from ' + @tmptable +' a
+				where Day=''10'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D11=''1''  from ' + @tmptable +' a
+				where Day=''11'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D12=''1''  from ' + @tmptable +' a
+				where Day=''12'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D13=''1''  from ' + @tmptable +' a
+				where Day=''13'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D14=''1''  from ' + @tmptable +' a
+				where Day=''14'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D15=''1''  from ' + @tmptable +' a
+				where Day=''15'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D16=''1''  from ' + @tmptable +' a
+				where Day=''16'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D17=''1''  from ' + @tmptable +' a
+				where Day=''17'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D18=''1''  from ' + @tmptable +' a
+				where Day=''18'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D19=''1''  from ' + @tmptable +' a
+				where Day=''19'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D20=''1''  from ' + @tmptable +' a
+				where Day=''20'' '
+print(@strQry )
+exec (@strQry)
+
+
+set @strQry = 'update a set D21=''1''  from ' + @tmptable +' a
+				where Day=''21'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D22=''1''  from ' + @tmptable +' a
+				where Day=''22'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D23=''1''  from ' + @tmptable +' a
+				where Day=''23'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D24=''1''  from ' + @tmptable +' a
+				where Day=''24'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D25=''1''  from ' + @tmptable +' a
+				where Day=''25'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D26=''1''  from ' + @tmptable +' a
+				where Day=''26'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D27=''1''  from ' + @tmptable +' a
+				where Day=''27'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D28=''1''  from ' + @tmptable +' a
+				where Day=''28'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D29=''1''  from ' + @tmptable +' a
+				where Day=''29'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D30=''1''  from ' + @tmptable +' a
+				where Day=''30'' '
+print(@strQry )
+exec (@strQry) 
+
+
+set @strQry = 'update a set D31=''1''  from ' + @tmptable +' a
+				where Day=''31'' '
+print(@strQry )
+exec (@strQry) 
+
+
+END
