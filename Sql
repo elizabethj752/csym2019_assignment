@@ -1,0 +1,154 @@
+USE [ApexDB]
+GO
+/****** Object:  StoredProcedure [dbo].[Apex_CRM_SupportCall_Daily]    Script Date: 4/27/2020 12:34:38 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[Apex_CRM_SupportCall_Daily]
+( 
+@CallerName  Varchar(100),
+@FromDate	Varchar(100),
+@ToDate		Varchar(100)
+)
+AS  
+BEGIN  declare @strQry as varchar(Max)
+declare @tmptable1 as varchar(150)
+declare @tmptable2 as varchar(150)
+declare @tmptable3 as varchar(150)
+
+
+SET @tmptable1 =	@CallerName + 'SupportCall_Daily_Detailed_Tbl'
+SET @tmptable2 =	@CallerName + 'SupportCall_Daily_ExecWise_Summary_Tbl'
+SET @tmptable3 =	@CallerName + 'SupportCall_Daily_Summary_Tbl'
+
+
+set @strQry = 'IF  EXISTS (SELECT 1 FROM  sys.objects WHERE name=' + CHAR(39) +  @tmptable1  + CHAR(39) + ' AND Type=''U'' )'                  
+set @strQry = @strQry + ' Drop table ' + @tmptable1
+exec (@strQry) 
+
+set @strQry = 'IF  EXISTS (SELECT 1 FROM  sys.objects WHERE name=' + CHAR(39) +  @tmptable2  + CHAR(39) + ' AND Type=''U'' )'                  
+set @strQry = @strQry + ' Drop table ' + @tmptable2
+exec (@strQry) 
+
+set @strQry = 'IF  EXISTS (SELECT 1 FROM  sys.objects WHERE name=' + CHAR(39) +  @tmptable3  + CHAR(39) + ' AND Type=''U'' )'                  
+set @strQry = @strQry + ' Drop table ' + @tmptable3            
+exec (@strQry) 
+
+--------------- Detailed table
+set @strQry = 'select * into '+@tmptable1+' from Service_Log_Details where Date >= '''+@FromDate+''+'''
+			   and Date <= '''+@ToDate+''+''''
+			   
+
+
+print(@strQry)
+exec(@strQry)
+
+set @strQry =' Alter Table '+@tmptable1+'
+				Add User_Name varchar(500), State Varchar(500), Zone Varchar(500),TeamTag Varchar(500),Station Varchar(500),TeamLeader  Varchar(500)'
+exec(@strQry)
+
+set @strQry = ' update a set a.User_Name = b.User_Name2 From '+@tmptable1+' a join Login_Details b on a.Handled_By = b.Login_Nm '
+exec(@strQry)
+
+
+set @strQry = 'update a set a.TeamLeader=b.Team from ' + @tmptable1 +' a join Login_Details b on a.Handled_By=b.Login_Nm'
+print(@strQry)
+exec (@strQry) 
+
+
+set @strQry = ' update a set State = b.State , Zone = b.Zone , Station = b.Station
+				from '+@tmptable1+' a join Contact_Details b on a.Cust_ID = b.Cust_ID '
+exec(@strQry)
+
+
+
+set @strQry = 'update a set a.TeamTag=''Team_B'' from ' + @tmptable1 +' a '
+print(@strQry)
+exec (@strQry)
+
+
+set @strQry = 'update a set a.TeamTag=''Team_A'' from ' + @tmptable1 +' a Where Department in (''Vanilla'',''CASD'',''Pune'') '
+print(@strQry)
+exec (@strQry)
+
+set @strQry = 'update a set a.TeamTag=''Team_C'' from ' + @tmptable1 +' a Where Department in (''Bajaj'',''Ultratech'',''Birlawhite'',''Panasonic'') '
+print(@strQry)
+exec (@strQry) 
+
+
+--Temp table 2-Executuve wise
+
+set @strQry = 'Select max(Handled_By)Handled_By, max(Department)Department, count(Status)Total_Calls  
+			into '+@tmptable2+' from '+@tmptable1+' group by Handled_By,Department'
+print(@strQry)
+exec(@strQry)
+
+set @strQry =' Alter Table '+@tmptable2+' Add User_Name varchar(500),TeamLeader varchar(500), Closed_Calls int, Pending_Calls int'
+print(@strQry)
+exec(@strQry)
+
+
+set @strQry = ' update a set a.User_Name = b.User_Name2 From '+@tmptable2+' a join Login_Details b on a.Handled_By = b.Login_Nm '
+exec(@strQry)
+
+
+set @strQry = 'update a set a.TeamLeader=b.Team from ' + @tmptable2 +' a join Login_Details b on a.Handled_By=b.Login_Nm'
+print(@strQry)
+exec (@strQry) 
+
+
+set @strQry = ' update a set a.Closed_Calls = b.Closed_Calls from '+@tmptable2+' a join
+(select Handled_By, Department, count(Status)Closed_Calls from '+@tmptable1+' where  Status = ''Closed'' group by Handled_By,Department) b
+on a.Handled_By = b.Handled_By and a.Department = b.Department' 
+print(@strQry)
+exec(@strQry)
+
+set @strQry = ' update a set a.Pending_Calls = b.Pending_Calls from '+@tmptable2+' a join
+(select Handled_By, Department, count(Status)Pending_Calls from '+@tmptable1+' where  Status <> ''Closed'' group by Handled_By,Department) b
+on a.Handled_By = b.Handled_By and a.Department = b.Department' 
+exec(@strQry)
+
+
+--------------- summary table
+
+set @strQry = 'Select max(Department)Department, count(Status)Total_Calls  into '+@tmptable3+' from '+@tmptable1+' group by Department'
+print(@strQry)
+exec(@strQry)
+
+set @strQry =' Alter Table '+@tmptable3+'
+				Add Closed_Calls int, Pending_Calls int,TeamTag Varchar(500)'
+print(@strQry)
+exec(@strQry)
+
+
+
+set @strQry = 'update a set a.TeamTag=''Team_B'' from ' + @tmptable3 +' a '
+print(@strQry)
+exec (@strQry)
+
+
+set @strQry = 'update a set a.TeamTag=''Team_A'' from ' + @tmptable3 +' a Where Department in (''Vanilla'',''CASD'',''Pune'') '
+print(@strQry)
+exec (@strQry)
+
+set @strQry = 'update a set a.TeamTag=''Team_C'' from ' + @tmptable3 +' a Where Department in (''Bajaj'',''Ultratech'',''Birlawhite'',''Panasonic'') '
+print(@strQry)
+exec (@strQry) 
+
+
+
+set @strQry = ' update a set a.Closed_Calls = b.Closed_Calls from '+@tmptable3+' a join
+(select department, count(Status)Closed_Calls from '+@tmptable1+' where  Status = ''Closed'' group by department) b
+on a.department = b.department' 
+print(@strQry)
+exec(@strQry)
+
+set @strQry = ' update a set a.Pending_Calls = b.Pending_Calls from '+@tmptable3+' a join
+(select department, count(Status)Pending_Calls from '+@tmptable1+' where  Status <> ''Closed'' group by department) b
+on a.department = b.department' 
+exec(@strQry)
+
+
+end
